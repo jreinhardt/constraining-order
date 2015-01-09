@@ -220,7 +220,9 @@ class Interval(object):
         return True
 
     def __repr__(self):
-        return str(self)
+        if self.is_empty():
+            return "Interval((1,0),(False,False))"
+        return "Interval(%s,%s)" % (self.bounds,self.included)
 
     def __str__(self):
         if self.is_empty():
@@ -308,6 +310,10 @@ class IntervalSet(object):
         else:
             return " u ".join(str(i) for i in self.ints)
 
+    def __repr__(self):
+        return "IntervalSet([%s])" % ",".join(i.__repr__() for i in self.ints)
+
+
 class DiscreteSet(object):
     """
     A set data structure for hashable elements
@@ -365,7 +371,7 @@ class DiscreteSet(object):
     def iter_members(self):
         if self.everything:
             raise ValueError("Can not iterate everything")
-        for coord in self.elements:
+        for coord in sorted(self.elements):
             yield coord
 
     def __contains__(self,element):
@@ -378,6 +384,11 @@ class DiscreteSet(object):
             return "<empty discrete set>"
         else:
             return "{%s}" % ",".join(str(e) for e in self.elements)
+
+    def __repr__(self):
+        if self.everything:
+            return "DiscreteSet.everything()"
+        return "DiscreteSet([%s])" % ",".join(i.__repr__() for i in sorted(self.elements))
 
 
 class Patch(object):
