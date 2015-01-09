@@ -138,6 +138,42 @@ class IntervalTest(unittest.TestCase):
         self.assertEqual(i[0].included,(False,False))
         self.assertEqual(i[0].bounds,(0,1.5))
 
+    def test_union(self):
+        op = (False,False)
+        cl = (True,True)
+        ho = (False,True)
+
+        #completely contained
+        i = Interval((0,5),op)._union(Interval((1,3),ho))
+        self.assertEqual(len(i),1)
+        self.assertEqual(i[0].included,op)
+        self.assertEqual(i[0].bounds,(0,5))
+
+        #disjoint
+        i = Interval((0,2),op)._union(Interval((3,4),ho))
+        self.assertEqual(len(i),2)
+
+        #empty set
+        i = Interval((0,0),op)._union(Interval((3,3),ho))
+        self.assertEqual(len(i),0)
+        i = Interval((0,2),op)._union(Interval((3,3),ho))
+        self.assertEqual(len(i),1)
+        i = Interval((0,0),op)._union(Interval((3,4),ho))
+        self.assertEqual(len(i),1)
+        i = Interval((1,1),ho)._union(Interval((1,1),cl))
+        self.assertEqual(len(i),1)
+
+        #point result
+        i = Interval((1,1),cl)._union(Interval((1,1),cl))
+        self.assertEqual(len(i),1)
+        self.assertTrue(i[0].is_discrete())
+
+        #some random cases
+        i = Interval((0,2.3),ho)._union(Interval((1.5,6),cl))
+        self.assertEqual(len(i),1)
+        self.assertEqual(i[0].included,ho)
+        self.assertEqual(i[0].bounds,(0,6))
+
 class DiscreteSetTest(unittest.TestCase):
     def setUp(self):
         self.a = DiscreteSet([1,2,3])
@@ -171,6 +207,10 @@ class DiscreteSetTest(unittest.TestCase):
         d = self.a.difference(self.b)
         self.assertEqual(len(d.elements),1)
 
+    def test_union(self):
+        d = self.a.union(self.b)
+        self.assertEqual(len(d.elements),4)
+
 class IntervalSetTest(unittest.TestCase):
     def setUp(self):
         op = (False,False)
@@ -186,9 +226,12 @@ class IntervalSetTest(unittest.TestCase):
         self.halfspace = Interval((0,float("inf")),cl)
 
     def test_init(self):
-        self.assertRaises(ValueError, lambda: IntervalSet([self.op,self.cl]))
-
         iset = IntervalSet([self.op, self.ho])
+
+        #Check merging of overlapping intervals
+        iset = IntervalSet([self.op,self.cl,self.ho,self.point,self.point2])
+        self.assertEqual(len(iset.ints),1)
+        self.assertEqual(iset.ints[0].bounds,(0,6))
 
         #Check pruning of empty sets
         iset = IntervalSet([self.empty])

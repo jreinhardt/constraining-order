@@ -126,6 +126,43 @@ class Interval(object):
         else:
             raise RuntimeError("This should not happen")
 
+    def _union(self,other):
+        #the set of intervals is not closed w.r.t the difference, as it might
+        #yield two disjoint intervals as a result. Therefore only use this as a
+        #utility function for IntervalSet, which doesn't suffer from this.
+
+        if self.is_empty() and other.is_empty():
+            return []
+        elif self.is_empty():
+            return [other]
+        elif other.is_empty():
+            return [self]
+
+        if self.bounds[0] < other.bounds[0]:
+            i1,i2 = self,other
+        elif self.bounds[0] > other.bounds[0]:
+            i2,i1 = self,other
+        else:
+            if self.included[0]:
+                i1,i2 = self,other
+            else:
+                i2,i1 = self,other
+
+        if i1.is_disjoint(i2):
+            return [i1,i2]
+        elif i2.bounds[0] in i1 and i2.bounds[1] in i1:
+            #-------
+            # ***
+            return [i1]
+        elif i2.bounds[0] in i1:
+            bounds = (i1.bounds[0],i2.bounds[1])
+            include = (i1.included[0],i2.included[1])
+            #-------
+            # *********
+            return [Interval(bounds,include)]
+        else:
+            raise RuntimeError("This should not happen")
+
     def intersection(self,other):
         if self.bounds[0] < other.bounds[0]:
             i1,i2 = self,other
@@ -206,7 +243,11 @@ class IntervalSet(object):
         for i in sorted(ints,key=lambda x: x.bounds[0]):
             if i.is_empty():
                 continue
-            self.ints.append(i)
+            if len(self.ints) > 0 and not i.is_disjoint(self.ints[-1]):
+                i2 = self.ints.pop(-1)
+                self.ints.extend(i2._union(i))
+            else:
+                self.ints.append(i)
 
         for i1,i2 in pairwise(self.ints):
             if not i1.is_disjoint(i2):
@@ -242,6 +283,9 @@ class IntervalSet(object):
                 res.append(i1.intersection(i2))
 
         return IntervalSet(res)
+
+    def join(self,other):
+        return IntervalSet(self.ints + other.ints)
 
     def difference(self,other):
         res = IntervalSet.everything()
@@ -309,6 +353,14 @@ class DiscreteSet(object):
             return DiscreteSet([])
         else:
             return DiscreteSet(self.elements.difference(other.elements))
+
+    def union(self,other):
+        if self.everything:
+            return self
+        elif other.everything:
+            return other
+        else:
+            return DiscreteSet(self.elements.union(other.elements))
 
     def iter_members(self):
         if self.everything:
