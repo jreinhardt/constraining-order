@@ -33,12 +33,10 @@ class Variable(object):
         "name of the variable"
         self.description = kwargs.get('description')
         "description of the variable"
-        self.unit = kwargs.get('unit')
-        "unit of the variable"
         self.domain = None
         "domain of the variable"
         self.discrete = None
-        "if the variable is discrete or continuous"
+        "whether the variable is discrete or continuous"
 
 class RealVariable(Variable):
     """
@@ -48,7 +46,6 @@ class RealVariable(Variable):
         Variable.__init__(
             self,
             name,
-            unit=kwargs.get('unit',''),
             description=kwargs.get('description','')
         )
 
@@ -63,7 +60,6 @@ class DiscreteVariable(Variable):
         Variable.__init__(
             self,
             name,
-            unit=kwargs.get('unit',''),
             description=kwargs.get('description','')
         )
 
