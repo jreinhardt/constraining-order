@@ -26,7 +26,8 @@ class Variable(object):
     """
     Abstract baseclass for variables.
 
-    Variables are immutable.
+    Variables describe the variables of a CSP. The instances are immutable
+    and only make sense in connection with a Space.
     """
     def __init__(self,name,**kwargs):
         self.name = name
@@ -43,6 +44,14 @@ class RealVariable(Variable):
     Continuous real variable with values from the real numbers.
     """
     def __init__(self,name,**kwargs):
+        """
+        Create a new RealVariable
+
+        :param str name: The name of the variable
+        :param str description: An optional description of the variable
+        :param IntervalSet domain: An optional domain for this variable,
+                                   defaults to everything.
+        """
         Variable.__init__(
             self,
             name,
@@ -54,9 +63,17 @@ class RealVariable(Variable):
 
 class DiscreteVariable(Variable):
     """
-    Discrete variable with values from a set of discrete elements.
+    Discrete variable with values from a DiscreteSet of elements.
     """
     def __init__(self,name,**kwargs):
+        """
+        Create a new DiscreteVariable
+
+        :param str name: The name of the variable
+        :param str description: An optional description of the variable
+        :param DiscreteSet domain: An optional domain for this variable,
+                                   defaults to everything.
+        """
         Variable.__init__(
             self,
             name,

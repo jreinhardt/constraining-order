@@ -32,6 +32,8 @@ def ac3(space):
     """
     AC-3 algorithm. This reduces the domains of the variables by
     propagating constraints to ensure arc consistency.
+
+    :param Space space: The space to reduce
     """
     #determine arcs
     arcs = {}
@@ -116,14 +118,17 @@ def _binary(space,const,name1,name2):
 
 def solve(space,method='backtrack',ordering=None):
     """
-    generator for all solutions.
+    Generator for all solutions.
 
-    Method can take the following values:
-    backtrack: simple chronological backtracking
-    ac-lookahead: full lookahead
-    ffp: full lookahead with fail first variable ordering
 
-    ordering is a list of all variable names in the order in which they will be considered
+    :param str method: the solution method to employ
+    :param ordering: an optional parameter ordering
+    :type ordering: sequence of parameter names
+
+    Methods:
+
+    :"backtrack": simple chronological backtracking
+    :"ac-lookahead": full lookahead
     """
     if ordering is None:
         ordering = space.variables.keys()

@@ -26,19 +26,23 @@ This module defines common stuff for constraint satisfaction probleme
 
 class Space(object):
     """
-    A space is a description of all the computation space for a specific csp
+    A space is a description of the computation space for a specific CSP.
     """
     def __init__(self,variables, constraints):
         """
-        variables is a list of Variables
-        constraints is a list of Constraints
+        Create a new Space for a CSP
+
+        :param variables: The variables of the CSP
+        :type variables: sequence of Variables
+        :param constraints: The constraints of the CSP
+        :type constraints: sequence of Constraints
         """
         self.constraints = constraints
         "list of constraints"
         self.variables = {}
         "dictionary of variable names to variable instances"
         self.domains = {}
-        "dictionary of variable names to DiscreteSet/IntervalSet"
+        "dictionary of variable names to DiscreteSet/IntervalSet with admissible values"
         for var in variables:
             self.variables[var.name] = var
             self.domains[var.name] = var.domain
