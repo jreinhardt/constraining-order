@@ -35,42 +35,84 @@ def pairwise(iterable):
 
 class Interval(object):
     """
-        Interval on real axis.
+    An interval on the real axis.
     """
     def __init__(self,bounds,included):
         """
-            bounds: tuple with left and right bound
-            included: whether the corresponding boundary value should be
-            included in the interval
+        Create a new Interval with bounds. If the right bound is larger than
+        the left bound, the interval is assumed to be empty.
+
+        :param sequence bounds: left and right bounds
+        :param sequence included: bools indicating whether the bounds are
+                                  included in the interval.
         """
         self.bounds = tuple(bounds)
         self.included = tuple(included)
 
     @classmethod
     def everything(cls):
+        """
+        Create a new Interval representing the full real axis
+        """
         return cls((-float("inf"),float("inf")),(True,True))
 
     @classmethod
     def from_value(cls,value):
+        """
+        Create a new Interval representing a single real number.
+
+        :param float value: The member of the Interval
+        """
         return cls((value,value),(True,True))
 
     @classmethod
     def open(cls,a,b):
+        """
+        Create a new open Interval.
+
+        :param float a: Left bound
+        :param float b: Right bound
+        """
         return cls((a,b),(False,False))
 
     @classmethod
     def closed(cls,a,b):
+        """
+        Create a new closed Interval.
+
+        :param float a: Left bound
+        :param float b: Right bound
+        """
         return cls((a,b),(True,True))
 
     @classmethod
     def leftopen(cls,a,b):
+        """
+        Create a new halfopen Interval (left bound is excluded, right bound
+        included).
+
+        :param float a: Left bound
+        :param float b: Right bound
+        """
         return cls((a,b),(False,True))
 
     @classmethod
     def rightopen(cls,a,b):
+        """
+        Create a new halfopen Interval (right bound is excluded, left bound
+        included).
+
+        :param float a: Left bound
+        :param float b: Right bound
+        """
         return cls((a,b),(True,False))
 
     def is_disjoint(self,other):
+        """
+        Check whether two Intervals are disjoint.
+
+        :param Interval other: The Interval to check disjointedness with.
+        """
         if self.is_empty() or other.is_empty():
             return True
 
@@ -91,8 +133,8 @@ class Interval(object):
 
     def _difference(self,other):
         #the set of intervals is not closed w.r.t the difference, as it might
-        #yield 0,1 or two intervals as a result. Therefore only use this as a
-        #utility function for IntervalSet, which doesn't suffer from this.
+        #yield zeor,one or two intervals as a result. Therefore this method
+        #is only used as a utility function for IntervalSet.
 
         if self.is_empty():
             return []
@@ -127,9 +169,9 @@ class Interval(object):
             raise RuntimeError("This should not happen")
 
     def _union(self,other):
-        #the set of intervals is not closed w.r.t the difference, as it might
-        #yield two disjoint intervals as a result. Therefore only use this as a
-        #utility function for IntervalSet, which doesn't suffer from this.
+        #the set of intervals is not closed w.r.t the union, as it might
+        #yield one or two intervals as a result. Therefore this method
+        #is only used as a utility function for IntervalSet.
 
         if self.is_empty() and other.is_empty():
             return []
@@ -164,6 +206,13 @@ class Interval(object):
             raise RuntimeError("This should not happen")
 
     def intersection(self,other):
+        """
+        Return a new Interval with the intersection of the two intervals,
+        i.e.  all elements that are in both self and other.
+
+        :param Interval other: Interval to intersect with
+        :rtype: Interval
+        """
         if self.bounds[0] < other.bounds[0]:
             i1,i2 = self,other
         else:
@@ -188,21 +237,43 @@ class Interval(object):
         return Interval(bounds,included)
 
     def is_empty(self):
+        """
+        Check whether this interval is empty.
+
+        :rtype: bool
+        """
         if self.bounds[1] < self.bounds[0]:
             return True
         if self.bounds[1] == self.bounds[0]:
             return not (self.included[0] and self.included[1])
 
     def is_discrete(self):
+        """
+        Check whether this interval contains exactly one number
+
+        :rtype: bool
+        """
         return self.bounds[1] == self.bounds[0] and\
                self.included == (True,True)
 
     def get_point(self):
+        """
+        Return the number contained in this interval.
+
+        :rtype: float
+        :raises ValueError: if Interval contains more than exactly one number.
+        """
         if not self.is_discrete():
             raise ValueError("Interval doesn't contain exactly one value")
         return self.bounds[0]
 
     def __contains__(self,x):
+        """
+        Check membership of the element.
+
+        :param float x: Element to check membership of
+        :rtype: bool
+        """
         if self.is_empty():
             return False
         if self.included[0]:
@@ -241,6 +312,11 @@ class IntervalSet(object):
     A set of intervals to represent quite general sets in R
     """
     def __init__(self,ints):
+        """
+        Create a new IntervalSet.
+
+        :param sequence ints: Intervals for this IntervalSet
+        """
         self.ints = []
         for i in sorted(ints,key=lambda x: x.bounds[0]):
             if i.is_empty():
@@ -257,28 +333,58 @@ class IntervalSet(object):
 
     @classmethod
     def everything(cls):
+        """
+        Create a new IntervalSet representing the full real axis.
+        """
         return cls([Interval.everything()])
 
     @classmethod
     def from_values(cls,values):
+        """
+        Create a new IntervalSet representing a set of isolated real numbers.
+
+        :param sequence values: The values for this IntervalSet
+        """
         return cls([Interval.from_value(v) for v in values])
 
     def is_empty(self):
+        """
+        Check whether this IntervalSet is empty.
+
+        :rtype: bool
+        """
         return len(self.ints) == 0
 
     def is_discrete(self):
+        """
+        Check whether this IntervalSet contains only isolated numbers.
+
+        :rtype: bool
+        """
         for i in self.ints:
             if not i.is_discrete():
                 return False
         return True
 
     def iter_members(self):
+        """
+        Iterate over all elements of the set.
+
+        :raises ValueError: if self is a set of everything
+        """
         if not self.is_discrete():
             raise ValueError("non-discrete IntervalSet can not be iterated")
         for i in self.ints:
             yield i.get_point()
 
     def intersection(self,other):
+        """
+        Return a new IntervalSet with the intersection of the two sets, i.e.
+        all elements that are both in self and other.
+
+        :param IntervalSet other: Set to intersect with
+        :rtype: IntervalSet
+        """
         res = []
         for i1 in self.ints:
             for i2 in other.ints:
@@ -287,9 +393,23 @@ class IntervalSet(object):
         return IntervalSet(res)
 
     def union(self,other):
+        """
+        Return a new IntervalSet with the union of the two sets, i.e.
+        all elements that are in self or other.
+
+        :param IntervalSet other: Set to intersect with
+        :rtype: IntervalSet
+        """
         return IntervalSet(self.ints + other.ints)
 
     def difference(self,other):
+        """
+        Return a new IntervalSet with the difference of the two sets, i.e.
+        all elements that are in self but not in other.
+
+        :param IntervalSet other: Set to subtract
+        :rtype: IntervalSet
+        """
         res = IntervalSet.everything()
         for j in other.ints:
             tmp = []
@@ -299,6 +419,12 @@ class IntervalSet(object):
         return res
 
     def __contains__(self,x):
+        """
+        Check membership of the element.
+
+        :param element: Element to check membership of
+        :rtype: bool
+        """
         for interval in self.ints:
             if x in interval:
                 return True
@@ -318,29 +444,58 @@ class DiscreteSet(object):
     """
     A set data structure for hashable elements
 
-    This is a wrapper around pythons set type, which additionally provides the
-    possibility to express the set of everything (which only makes sense
+    This is a wrapper around pythons set type, which additionally provides
+    the possibility to express the set of everything (which only makes sense
     sometimes).
     """
     def __init__(self,elements):
+        """
+        Create a new DiscreteSet
+
+        :param sequence elements: The elements of the newly created set
+        """
         self.everything = False
         self.elements = frozenset(elements)
 
     @classmethod
     def everything(cls):
+        """
+        Create a new set of everything.
+
+        One can not iterate over the elements of this set, but many
+        operations are actually well defined and useful.
+        """
         res = cls([])
         res.everything = True
         return res
 
     def is_empty(self):
+        """
+        Check whether the set is empty
+
+        :rtype: bool
+        """
         if self.everything:
             return False
         return len(self.elements) == 0
 
     def is_discrete(self):
+        """
+        Check whether the set is discrete, i.e. if :meth:`iter_members` can
+        be used.
+
+        :rtype: bool
+        """
         return not self.everything
 
     def intersection(self,other):
+        """
+        Return a new DiscreteSet with the intersection of the two sets, i.e.
+        all elements that are in both self and other.
+
+        :param DiscreteSet other: Set to intersect with
+        :rtype: DiscreteSet
+        """
         if self.everything:
             if other.everything:
                 return DiscreteSet()
@@ -353,6 +508,14 @@ class DiscreteSet(object):
                 return DiscreteSet(self.elements.intersection(other.elements))
 
     def difference(self,other):
+        """
+        Return a new DiscreteSet with the difference of the two sets, i.e.
+        all elements that are in self but not in other.
+
+        :param DiscreteSet other: Set to subtract
+        :rtype: DiscreteSet
+        :raises ValueError: if self is a set of everything
+        """
         if self.everything:
             raise ValueError("Can not remove from everything")
         elif other.everything:
@@ -361,6 +524,13 @@ class DiscreteSet(object):
             return DiscreteSet(self.elements.difference(other.elements))
 
     def union(self,other):
+        """
+        Return a new DiscreteSet with the union of the two sets, i.e.
+        all elements that are in self or in other.
+
+        :param DiscreteSet other: Set to unite with
+        :rtype: DiscreteSet
+        """
         if self.everything:
             return self
         elif other.everything:
@@ -369,12 +539,23 @@ class DiscreteSet(object):
             return DiscreteSet(self.elements.union(other.elements))
 
     def iter_members(self):
+        """
+        Iterate over all elements of the set.
+
+        :raises ValueError: if self is a set of everything
+        """
         if self.everything:
             raise ValueError("Can not iterate everything")
         for coord in sorted(self.elements):
             yield coord
 
     def __contains__(self,element):
+        """
+        Check membership of the element.
+
+        :param element: Element to check membership of
+        :rtype: bool
+        """
         if self.everything:
             return True
         return element in self.elements
@@ -391,13 +572,16 @@ class DiscreteSet(object):
         return "DiscreteSet([%s])" % ",".join(i.__repr__() for i in sorted(self.elements))
 
 
+#These are not used or documented at the moment, but might be useful in the
+#future
+
 class Patch(object):
     def __init__(self,sets):
         """
         A patch of multidimensional parameter space
 
-        sets is a dict of names to DiscreteSet or IntervalSets of feasible values and
-        represents the cartesion product of these
+        sets is a dict of names to DiscreteSet or IntervalSets of feasible
+        values and represents the cartesion product of these
         """
         self.sets = sets
         self.discrete = True
