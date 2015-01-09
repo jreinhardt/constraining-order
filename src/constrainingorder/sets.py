@@ -318,7 +318,7 @@ class DiscreteSet(object):
     """
     def __init__(self,elements):
         self.everything = False
-        self.elements = set(elements)
+        self.elements = frozenset(elements)
 
     @classmethod
     def everything(cls):
