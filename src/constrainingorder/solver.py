@@ -92,51 +92,58 @@ def _binary(space,const,name1,name2):
     else:
         return False
 
-def solve(space,method='backtrack'):
+def solve(space,method='backtrack',ordering=None):
     """
     generator for all solutions.
 
     Method can take the following values:
     backtrack: simple chronological backtracking
     ac-lookahead: full lookahead
+    ffp: full lookahead with fail first variable ordering
+
+    ordering is a list of all variable names in the order in which they will be considered
     """
+    if ordering is None:
+        ordering = space.variables.keys()
+
     if not space.is_discrete():
         raise ValueError("Can not backtrack on non-discrete space")
     if method=='backtrack':
-        for label in _backtrack(space,{}):
+        for label in _backtrack(space,{},ordering):
             yield label
     elif method=='ac-lookahead':
-        for label in _lookahead(space,{}):
+        for label in _lookahead(space,{},ordering):
             yield label
+    else:
+        raise ValueError("Unknown solution method: %s" % method)
 
 
-def _backtrack(space,label):
+def _backtrack(space,label,ordering):
+    level = len(label)
+    if level == len(space.variables):
+        if space.satisfied(label):
+            yield label
+    elif space.consistent(label):
+        vname = ordering[level]
+        newlabel = label.copy()
+        for val in space.domains[vname].iter_members():
+            newlabel[vname] = val
+            for sol in _backtrack(space,newlabel,ordering):
+                yield sol
+
+def _lookahead(space,label,ordering):
+    level = len(label)
     if len(label) == len(space.variables):
         if space.satisfied(label):
             yield label
     elif space.consistent(label):
-        for vname in space.variables:
-            if not vname in label:
-                newlabel = label.copy()
-                for val in space.domains[vname].iter_members():
-                    newlabel[vname] = val
-                    for sol in _backtrack(space,newlabel):
-                        yield sol
-                break
-
-def _lookahead(space,label):
-    if len(label) == len(space.variables):
-        if space.satisfied(label):
-            yield label
-    elif space.consistent(label):
-        for vname,var in space.variables.iteritems():
-            if not vname in label:
-                newlabel = label.copy()
-                for val in space.domains[vname].iter_members():
-                    nspace = Space(space.variables.values(),
-                                   space.constraints + [FixedValue(var,val)])
-                    newlabel[vname] = val
-                    ac3(nspace)
-                    for sol in _backtrack(nspace,newlabel):
-                        yield sol
-                break
+        vname = ordering[level]
+        var = space.variables[vname]
+        newlabel = label.copy()
+        for val in space.domains[vname].iter_members():
+            nspace = Space(space.variables.values(),
+                           space.constraints + [FixedValue(var,val)])
+            newlabel[vname] = val
+            ac3(nspace)
+            for sol in _lookahead(nspace,newlabel,ordering):
+                yield sol
