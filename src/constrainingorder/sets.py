@@ -284,7 +284,7 @@ class IntervalSet(object):
 
         return IntervalSet(res)
 
-    def join(self,other):
+    def union(self,other):
         return IntervalSet(self.ints + other.ints)
 
     def difference(self,other):

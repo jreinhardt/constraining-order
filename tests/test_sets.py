@@ -285,6 +285,20 @@ class IntervalSetTest(unittest.TestCase):
         self.assertTrue(iset.is_discrete())
         self.assertFalse(iset.is_empty())
 
+    def test_union(self):
+        op = (False,False)
+        cl = (True,True)
+        ho = (False,True)
+
+        iset = IntervalSet([Interval((0,5),op)]).union(IntervalSet([Interval((1,3),ho)]))
+        self.assertEqual(len(iset.ints),1)
+
+        #points
+        iset = IntervalSet.from_values([1,1.2,2]).union(IntervalSet.from_values([1.2,3]))
+        self.assertTrue(iset.is_discrete())
+        self.assertFalse(iset.is_empty())
+        self.assertEqual(len(iset.ints),4)
+
 class TestPatch(unittest.TestCase):
     def setUp(self):
         op = (False,False)
