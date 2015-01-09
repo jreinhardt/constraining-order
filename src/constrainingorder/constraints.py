@@ -2,6 +2,7 @@
 This module defines classes describing constraints on variables
 """
 from constrainingorder.sets import DiscreteSet, IntervalSet
+from itertools import product
 
 class Constraint(object):
     def __init__(self,domains):
@@ -56,26 +57,20 @@ class AllDifferent(Constraint):
     def __init__(self,variables):
         Constraint.__init__(self,dict((v,v.domain) for v in variables))
     def satisfied(self,lab):
-        for v1 in self.vnames:
-            if v1 not in lab:
+        for v1,v2 in product(self.vnames,repeat=2):
+            if v1 not in lab or v2 not in lab:
                 return False
-            for v2 in self.vnames:
-                if v1 == v2:
-                    continue
-                if lab[v1] == lab[v2]:
-                    return False
+            if v1 == v2:
+                continue
+            if lab[v1] == lab[v2]:
+                return False
         return True
     def consistent(self,lab):
-        for v1 in self.vnames:
-            if v1 not in lab:
+        for v1,v2 in product(self.vnames,repeat=2):
+            if v1 not in lab or v2 not in lab or v1 == v2:
                 continue
-            for v2 in self.vnames:
-                if v2 not in lab:
-                    continue
-                if v1 == v2:
-                    continue
-                if lab[v1] == lab[v2]:
-                    return False
+            if lab[v1] == lab[v2]:
+                return False
         return True
 
 class Domain(Constraint):
