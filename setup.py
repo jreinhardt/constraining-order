@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 from codecs import open
-from os import path
+from os import path, listdir
 
 here = path.abspath(path.dirname(__file__))
 
@@ -18,11 +18,12 @@ setup(
     version=version,
     packages=find_packages("src"),
     package_dir={"" : "src"},
-    description='Pure python constraint satisfaction solvers',
+    include_package_data=True,
+    description='Pure python constraint satisfaction solver',
     long_description=long_description,
     author="Johannes Reinhardt",
     author_email="jreinhardt@ist-dein-freund.de",
-    license="LGPL 2.1+",
-    keywords="csp constraint satisfaction propagation intervals",
-    url="https://github.com/jreinhardt/constraining order"
+    license="MIT",
+    keywords=["csp","constraint","satisfaction","propagation","sets","intervals"],
+    url="https://github.com/jreinhardt/constraining-order"
 )
