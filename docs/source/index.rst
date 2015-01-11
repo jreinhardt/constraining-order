@@ -39,6 +39,10 @@ For python there are several packages for constraint satisfaction problems:
 
 For a nice overview over the theoretical foundations, see e.g. [Tsang96]_.
 
+The code is hosted on GitHub:
+
+https://github.com/jreinhardt/constraining-order
+
 Contents:
 
 .. toctree::
