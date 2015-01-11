@@ -8,9 +8,9 @@ of IntervalSets to represent fairly general sets of real numbers.
 Constraining order is neither very powerful, nor very performant, and for
 serious problems there are more powerful solutions available:
 
-* [gecode](http://www.gecode.org) (which looks amazing and superbly documented)
-* [or-tools](https://code.google.com/p/or-tools/)
-* [choco](http://www.choco-solver.org/)
+* `gecode <http://www.gecode.org>`_ (which looks amazing and superbly documented)
+* `or-tools <https://code.google.com/p/or-tools/>`_
+* `choco <http://www.choco-solver.org/>`_
 
 The creation of constraining order was sparked by the realisation that several
 of my problems require the solution of relatively simple constraint
