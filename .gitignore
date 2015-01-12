@@ -1,4 +1,6 @@
 .*.swp
 *.pyc
+.tox
+.coverage
 *.egg-info
 docs/build
