@@ -565,7 +565,7 @@ class DiscreteSet(object):
         if self.is_empty():
             return "<empty discrete set>"
         else:
-            return "{%s}" % ",".join(str(e) for e in self.elements)
+            return "{%s}" % ",".join(str(e) for e in sorted(self.elements))
 
     def __repr__(self):
         if self.everything:
