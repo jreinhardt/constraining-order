@@ -11,7 +11,8 @@ constraint satisfaction problems (CSP). In particular it contains an
 implementation of IntervalSets to represent fairly general sets of real
 numbers.
 
-Constraining Order is licensed under the MIT license.
+Constraining Order works (at least) with Python 2.7, 3.4 and PyPy and is
+licensed under the MIT license.
 
 Constraining Order is relatively flexible in the sense that many CSPs can be
 quickly modeled and new constraints can be implemented very easily. However
