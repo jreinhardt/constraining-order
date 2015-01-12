@@ -21,6 +21,7 @@ setup(
     include_package_data=True,
     description='Pure python constraint satisfaction solver',
     long_description=long_description,
+    install_requires=['future'],
     author="Johannes Reinhardt",
     author_email="jreinhardt@ist-dein-freund.de",
     license="MIT",
