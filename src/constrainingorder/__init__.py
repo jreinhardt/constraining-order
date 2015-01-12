@@ -24,6 +24,9 @@
 This module defines common stuff for constraint satisfaction probleme
 """
 
+from __future__ import unicode_literals
+from builtins import object
+
 class Space(object):
     """
     A space is a description of the computation space for a specific CSP.

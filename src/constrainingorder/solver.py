@@ -23,6 +23,7 @@
 """
 This module contains functions for solving and reducing CSPs
 """
+from __future__ import unicode_literals
 from itertools import product
 from constrainingorder import Space
 from constrainingorder.constraints import FixedValue
@@ -131,7 +132,7 @@ def solve(space,method='backtrack',ordering=None):
     :"ac-lookahead": full lookahead
     """
     if ordering is None:
-        ordering = space.variables.keys()
+        ordering = list(space.variables.keys())
 
     if not space.is_discrete():
         raise ValueError("Can not backtrack on non-discrete space")
@@ -168,7 +169,7 @@ def _lookahead(space,label,ordering):
         var = space.variables[vname]
         newlabel = label.copy()
         for val in space.domains[vname].iter_members():
-            nspace = Space(space.variables.values(),
+            nspace = Space(list(space.variables.values()),
                            space.constraints + [FixedValue(var,val)])
             newlabel[vname] = val
             ac3(nspace)

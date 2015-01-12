@@ -23,6 +23,8 @@
 """
 This module defines classes describing constraints on variables
 """
+from __future__ import unicode_literals
+from builtins import str, object
 from constrainingorder.sets import DiscreteSet, IntervalSet
 from itertools import product
 
@@ -32,7 +34,7 @@ class Constraint(object):
         "Names of the variables affected by this constraint"
         self.domains = {}
         "Domains imposed by node consistency for this constraint"
-        for var,dom in domains.iteritems():
+        for var,dom in domains.items():
             self.domains[var.name] = dom
     def satisfied(self,lab):
         """

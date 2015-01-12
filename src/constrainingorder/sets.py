@@ -24,14 +24,15 @@
 This module defines datastructures to represent discrete and real sets in one
 and more dimensions
 """
-
-from itertools import tee,izip,product
+from __future__ import unicode_literals
+from builtins import zip, next, str, object
+from itertools import tee,product
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
     a, b = tee(iterable)
     next(b, None)
-    return izip(a, b)
+    return zip(a, b)
 
 class Interval(object):
     """
@@ -603,7 +604,7 @@ class Patch(object):
         res = {}
         if set(self.sets.keys()) != set(other.sets.keys()):
             raise KeyError('Incompatible patches in intersection')
-        for name,s1 in self.sets.iteritems():
+        for name,s1 in self.sets.items():
             s2 = other.sets[name]
             res[name] = s1.intersection(s2)
         return Patch(res)
@@ -618,7 +619,7 @@ class Patch(object):
             yield tuple(zip(names,coordinates))
 
     def __contains__(self,point):
-        for name, coord in point.iteritems():
+        for name, coord in point.items():
             if not coord in self.sets[name]:
                 return False
         return True
@@ -627,7 +628,7 @@ class Patch(object):
         if self.is_empty():
             return "<empty patch>"
         else:
-            sets = ["%s:%s" % (n,str(i)) for n,i in self.sets.iteritems()]
+            sets = ["%s:%s" % (n,str(i)) for n,i in self.sets.items()]
             return " x ".join(sets)
 
 class PatchSet(object):

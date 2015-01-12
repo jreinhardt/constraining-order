@@ -20,7 +20,12 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-from sets import DiscreteSet, IntervalSet
+"""
+This module defines classes representing variables
+"""
+from __future__ import unicode_literals
+from builtins import object
+from constrainingorder.sets import DiscreteSet, IntervalSet
 
 class Variable(object):
     """
