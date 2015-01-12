@@ -26,5 +26,13 @@ setup(
     author_email="jreinhardt@ist-dein-freund.de",
     license="MIT",
     keywords=["csp","constraint","satisfaction","propagation","sets","intervals"],
-    url="https://github.com/jreinhardt/constraining-order"
+    url="https://github.com/jreinhardt/constraining-order",
+    classifiers = [
+        "Development Status :: 3 - Alpha",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: Implementation :: PyPy",
+    ]
 )
